@@ -40,6 +40,12 @@ run.py 写出 run_config.json、traces/<安全哈希>.json、diagnoses/<安全�
 
 通过 mock SDK 的工作流验证一条轨迹只有一次 query、非模型问题早结束、错误引用原文校验、审查结果传播、所有诊断进入聚类输入、supported 分配完整性、唯一轨迹/独立任务计数、失败状态、checkpoint 失效、中文报告保留完整产物。既有凭据隔离和数据过滤测试保留。真实 GLM 端点行为与节省 token 的幅度需另行验证，离线测试不代表真实质量评测。
 
+## 公网文档发布
+
+公网地址：https://asd765973346.github.io/Traceforge-docs/bad-pattern-lab/ 。站点由单独的公开文档仓库 Traceforge-docs 发布到 GitHub Pages，代码仓库保持私有。生成页面后执行 `python tools/publish_docs.py`：先检查文档与源码一致，再只同步 index.html 和 PROPOSAL.md，推送后由文档仓库 Actions 部署。公开文件是从权威正文生成的发布产物，不在公开仓库独立编辑；不发布凭据、真实轨迹或运行结果。
+
+部分兼容模型通过父会话 StructuredOutput 工具块返回 JSON，而 ResultMessage 的 structured_output 为空。runner 支持该回退路径，之后仍执行完整 schema 与原文证据校验；未通过校验的模型产物仍记为 error。
+
 ## 单条会话：输入、每一步工作与结束条件
 
 诊断的 user prompt 包含一条完整 StandardTrace JSON 和该轨迹的只读文件路径。system prompt 来自 TRACE_ANALYSIS_SKILL，存在对应 benchmark skill 时追加它；JSON Schema 通过 SDK 的 output_format 约束最终返回。模型看到的是完整轨迹，不只是最终低分。真实固定 prompt、完整 skill 与 schema 可在同目录交互页的“Prompt / Schema 原文”查看，它们从源码生成。
