@@ -18,7 +18,7 @@
 
 Diagnosis 顶层包含 task_summary、outcome_summary、classification、errors、first_error_id、critical_error_id、patterns、limitations。
 
-classification 包含 primary_cause（五类）、rationale、evidence[]、alternative_explanations[]、missing_information[]。每条 evidence 固定为 step_id、field、quote、supports；field 是某步内的 JSON Pointer（例如 /message 或 /observation/results/0/content）。程序确认步骤存在、field 指向文本、quote 是该原文的非空子串。
+classification 包含 primary_cause（五类）、rationale、evidence[]、alternative_explanations[]、missing_information[]。每条 evidence 固定为 step_id、field、quote、supports；field 是某步内的 JSON Pointer（例如 /message 或 /observation/results/0/content）。程序确认步骤存在、field 指向文本、quote 是该原文或其严格 JSON 解码后字符串叶子的非空子串。工具观察常把 JSON 对象序列化为 content 字符串，因此允许这种无损解码；不做 HTML 解码、任意 Unicode 转换、空白或缩进折叠，也不自动修正错误步骤和 field。
 
 errors[] 每项有 error_id、step_id、category、available_information、expected_action、actual_action、causal_explanation、recovery、evidence[]。recovery 明确 recovered/unrecovered/unknown、rationale、evidence[]。程序确保事件步骤有引用依据。first_error_id 指向时间上首个可确认错误，critical_error_id 指向对失败有决定影响的关键错误；model_failure 时两者必须引用 errors 中存在的事件，可以指向同一事件。
 
@@ -44,7 +44,7 @@ run.py 写出 run_config.json、traces/<安全哈希>.json、diagnoses/<安全�
 
 公网地址：https://asd765973346.github.io/Traceforge-docs/bad-pattern-lab/ 。站点由单独的公开文档仓库 Traceforge-docs 发布到 GitHub Pages，代码仓库保持私有。生成页面后执行 `python tools/publish_docs.py`：先检查文档与源码一致，再只同步 index.html 和 PROPOSAL.md，推送后由文档仓库 Actions 部署。公开文件是从权威正文生成的发布产物，不在公开仓库独立编辑；不发布凭据、真实轨迹或运行结果。
 
-部分兼容模型通过父会话 StructuredOutput 工具块返回 JSON，而 ResultMessage 的 structured_output 为空。runner 支持该回退路径，之后仍执行完整 schema 与原文证据校验；未通过校验的模型产物仍记为 error。
+部分兼容模型通过父会话 StructuredOutput 工具块返回 JSON，而 ResultMessage 的 structured_output 为空。runner 仅在对应父会话工具调用收到成功 tool_result 确认后使用该回退路径，之后仍执行完整 schema 与原文证据校验；未通过校验的模型产物仍记为 error。
 
 ## 单条会话：输入、每一步工作与结束条件
 
